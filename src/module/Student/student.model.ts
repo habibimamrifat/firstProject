@@ -1,5 +1,20 @@
 import { Schema, model } from "mongoose";
-import { Gurdian, Student, localGirdian } from "./student.interface";
+import { Gurdian, Name, Student, localGirdian } from "./student.interface";
+import validator from "validator";
+import { any } from "joi";
+
+const nameSchima = new Schema<Name>({
+  firstName: {
+    type: String,
+    required: true,
+    validate: {
+      validator: (value: string) => validator.isAlpha(value),
+      message: "this value is not correct",
+    },
+  },
+  middleName: String,
+  lastName: String,
+});
 
 const gurdianSchema = new Schema<Gurdian>({
   fatherName: { type: String },
@@ -17,23 +32,43 @@ const localGurdianSchema = new Schema<localGirdian>({
 });
 
 const studentSchema = new Schema<Student>({
-  name: {
-    firstName: { type: String },
-    middleName: { type: String },
-    lastName: { type: String },
+  idx: {
+    type: String,
   },
-  gender: ["male", "female"],
+  name: { type: nameSchima, required: [true, "the name is required"] },
+  gender: {
+    type: String,
+    enum: ["male", "female"],
+  },
   dateOfBirth: String,
-  email: String,
+  email: {
+    type: String,
+    required: true,
+    validate: {
+      validator: (value: string) => validator.isEmail(value),
+      message: "this is not a valid email type",
+    },
+  },
   mobileNo: String,
   emmergencyMobileNo: String,
-  bloodGroup: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-  gurdian:gurdianSchema,
+  bloodGroup: {
+    type: String,
+    enum: {
+      values: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      message: "{VALUE} is not valid",
+    },
+  },
+  gurdian: gurdianSchema,
   localGurdian: localGurdianSchema,
   profileImg: String,
-  isactive: ["active", "inactive"],
+  isactive: {
+    type: String,
+    enum: ["active", "inactive"],
+    default: "active",
+    required: true,
+  },
 });
 
-// in this line of code we  create a veriable called stdunt and model<Student> we tell what type of model will be then we  ("Student" -> this one is the name of model that we are creating , studentSchema -> this is the name based on which we are creating the model) 
+// in this line of code we  create a veriable called stdunt and model<Student> we tell what type of model will be then we  ("Student" -> this one is the name of model that we are creating , studentSchema -> this is the name based on which we are creating the model)
 
-export const studentModel = model<Student>('Student', studentSchema);
+export const studentModel = model<Student>("Student", studentSchema);

@@ -18,9 +18,8 @@ app.use(cors());
 app.use("/api/v1/students", Studentroute)
 
 
-const a = 5;
 app.get('/', (req, res) => {
-  res.send(a);
+  res.send("THE PORT IS WORKING");
 });
 
 export default app;

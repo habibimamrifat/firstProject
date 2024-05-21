@@ -1,6 +1,11 @@
 
 
 // 1. Create an interface representing a document in MongoDB.
+export type Name ={
+  firstName: string;
+  middleName: string;
+  lastName: string;
+}
 export type Gurdian = {
   fatherName: string;
   fatherOccupation: string;
@@ -16,11 +21,8 @@ export type localGirdian = {
 };
 
 export type Student = {
-  name: {
-    firstName: string;
-    middleName: string;
-    lastName: string;
-  };
+  idx:string;
+  name:Name ;
   gender: "male" | "female";
   dateOfBirth: string;
   email: string;

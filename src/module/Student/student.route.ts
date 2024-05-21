@@ -9,8 +9,8 @@ const router = express.Router()
 // request => /api/v1/students/create-student ....suppose
  // /create-student ....section will be checked here
 router.post("/create_student", StudentController.createStudent)
-
-
+router.get("/all_students",StudentController.getAllStudent)
+router.get("/findOne/:id", StudentController.findOneStudent)
 
 // we no need to export as object as "route" its seff is avbn ovbject . we export it directly
 export const Studentroute = router;
