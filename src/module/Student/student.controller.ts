@@ -1,42 +1,37 @@
 import { Request, Response } from "express";
 import { StudentServices } from "./student.services";
-import studentJoiValidationSchema from "./student.Joivalidation";
+import studentValidationSchema from "./student.validation";
+
 
 const createStudent = async (req: Request, res: Response) => {
-  // as data comes here we need to validate the data here we need to create joy object and validate the inpute
+ 
   const { student: studentData } = req.body;
 
-  const {error, value}=studentJoiValidationSchema.validate(studentData)
-  console.log({error}, {value})
-  if(error)
-    {
-        res.status(200).json({
-            ststus: false,
-            message: "something went wrong",
-            body: error,
-          });  
-    }
-    else
-    {
-        try {
-           
-            // call service function to handle and send this data
-            const result = await StudentServices.createStudentIntoDb(value);
-            // send responce
-            res.status(200).json({
-              status: true,
-              message: "created Student Successfully",
-              data: result,
-            });
-          } catch (err) {
-            res.status(200).json({
-              ststus: false,
-              message: "something went wrong",
-              body: err,
-            });
-          }
-    }
+  const studentZodParsed =studentValidationSchema.parse(studentData);
+    console.log("yooooo", studentZodParsed)
 
+  try {
+   
+    const result = await StudentServices.createStudentIntoDb(studentZodParsed);
+
+    // Send response
+    res.status(201).json({
+      status: true,
+      message: "Created student successfully",
+      data: result,
+    });
+
+  } catch (err) {
+    
+      // Handle validation errors
+      res.status(400).json({
+        status: false,
+        message: "Validation Error",
+        body:err
+      });
+
+    }
+  
   // rest of the codes here
   
 };

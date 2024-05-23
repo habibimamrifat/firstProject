@@ -27,7 +27,6 @@ export type Student = {
   dateOfBirth: string;
   email: string;
   mobileNo: string;
-  emmergencyMobileNo: string;
   bloodGroup: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
   gurdian: Gurdian;
   localGurdian: localGirdian;

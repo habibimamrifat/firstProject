@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 import { Gurdian, Name, Student, localGirdian } from "./student.interface";
 import validator from "validator";
-import { any } from "joi";
+
 
 const nameSchima = new Schema<Name>({
   firstName: {
@@ -49,8 +49,8 @@ const studentSchema = new Schema<Student>({
       message: "this is not a valid email type",
     },
   },
-  mobileNo: String,
-  emmergencyMobileNo: String,
+  mobileNo: { type: String},
+  
   bloodGroup: {
     type: String,
     enum: {
