@@ -1,9 +1,14 @@
 import { Schema, model } from "mongoose";
-import { Gurdian, Name, Student, localGirdian } from "./student.interface";
+import { TGurdian, TName, TStudent, TlocalGirdian, UserSaticModel} from "./student.interface";
 import validator from "validator";
+import bcrypt from "bcrypt"
+import config from "../../config";
 
 
-const nameSchima = new Schema<Name>({
+
+// , StudentMathods, StudentModel
+
+const nameSchima = new Schema<TName>({
   firstName: {
     type: String,
     required: true,
@@ -16,7 +21,7 @@ const nameSchima = new Schema<Name>({
   lastName: String,
 });
 
-const gurdianSchema = new Schema<Gurdian>({
+const gurdianSchema = new Schema<TGurdian>({
   fatherName: { type: String },
   fatherOccupation: { type: String },
   fatherContactNo: { type: String },
@@ -25,15 +30,19 @@ const gurdianSchema = new Schema<Gurdian>({
   motherContactNo: { type: String },
 });
 
-const localGurdianSchema = new Schema<localGirdian>({
+const localGurdianSchema = new Schema<TlocalGirdian>({
   name: { type: String },
   contactNo: { type: String },
   occupation: { type: String },
 });
 
-const studentSchema = new Schema<Student>({
+// ,StudentModel,StudentMathods
+const studentSchema = new Schema<TStudent, UserSaticModel>({
   idx: {
     type: String,
+  },
+  password:{
+    type:String
   },
   name: { type: nameSchima, required: [true, "the name is required"] },
   gender: {
@@ -58,8 +67,8 @@ const studentSchema = new Schema<Student>({
       message: "{VALUE} is not valid",
     },
   },
-  gurdian: gurdianSchema,
-  localGurdian: localGurdianSchema,
+  gurdianX: gurdianSchema,
+  localGurdianX: localGurdianSchema,
   profileImg: String,
   isactive: {
     type: String,
@@ -67,8 +76,74 @@ const studentSchema = new Schema<Student>({
     default: "active",
     required: true,
   },
+  isDeleted:{
+    type:Boolean,
+    default:false
+  }
+},
+{
+  toJSON:{
+    virtuals:true
+  }
 });
 
 // in this line of code we  create a veriable called stdunt and model<Student> we tell what type of model will be then we  ("Student" -> this one is the name of model that we are creating , studentSchema -> this is the name based on which we are creating the model)
 
-export const studentModel = model<Student>("Student", studentSchema);
+// now implement the function instent mathod
+// studentSchema.methods.isUserExist = async function(id:string) {
+//   const result = await student.findOne({id})
+//   return result
+// }
+
+studentSchema.pre("save", async function(next){
+  const user = this;
+  user.password = await bcrypt.hash(user.password, Number(config.bcrypt_saltRounds));
+  next()
+})
+
+
+studentSchema.statics.isUserExist= async function(id: string){
+  const result = student.findOne({id})
+  return result
+}
+
+// Middleware to exclude deleted documents
+studentSchema.pre("find", async function(next) {
+ 
+  try {
+    this.find({ isDeleted: { $ne: true }});
+    next(); // Call next() after modifying the query
+  } catch (error: any) {
+    next(error); // Call next with an error if something goes wrong
+  }
+});
+studentSchema.pre("findOne", async function(next) {
+ 
+  try {
+    this.findOne({ isDeleted: { $ne: true }});
+    next(); // Call next() after modifying the query
+  } catch (error: any) {
+    next(error); // Call next with an error if something goes wrong
+  }
+});
+
+
+studentSchema.pre("aggregate", async function(next) {
+ 
+ try{
+  
+   this.pipeline().unshift({$match :{ isDeleted:{$ne: true}}})
+ }catch(err:any)
+ {
+  console.log(err)
+ }
+});
+
+studentSchema.virtual("fullName").get(function(){
+  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`
+})
+
+
+
+
+export const student = model<TStudent,UserSaticModel>("Student", studentSchema);

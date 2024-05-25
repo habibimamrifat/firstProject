@@ -11,6 +11,7 @@ const router = express.Router()
 router.post("/create_student", StudentController.createStudent)
 router.get("/all_students",StudentController.getAllStudent)
 router.get("/findOne/:id", StudentController.findOneStudent)
+router.delete("/deleteOne/:id", StudentController.deleteOneFromtheDatabase)
 
 // we no need to export as object as "route" its seff is avbn ovbject . we export it directly
 export const Studentroute = router;

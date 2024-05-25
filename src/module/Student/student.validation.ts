@@ -1,3 +1,4 @@
+import { string } from 'joi';
 import { z } from 'zod';
 
 // Define individual schemas for nested objects
@@ -27,6 +28,7 @@ const localGuardianValidationSchema = z.object({
 // Define the main student schema
 const studentValidationSchema = z.object({
   idx: z.string(),
+  password:z.string(),
   name: nameValidationSchema,
   gender: z.enum(["male", "female"]),
   dateOfBirth: z.string(),
@@ -36,10 +38,11 @@ const studentValidationSchema = z.object({
   mobileNo: z.string(),
  
   bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
-  gurdian: guardianValidationSchema,
-  localGurdian: localGuardianValidationSchema,
+  gurdianX: guardianValidationSchema,
+  localGurdianX: localGuardianValidationSchema,
   profileImg: z.string().url(),
   isactive: z.enum(["active", "inactive"]).default("active"),
+  isDeleted:z.boolean()
 });
 
 export default studentValidationSchema;

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { StudentServices } from "./student.services";
 import studentValidationSchema from "./student.validation";
+import { student } from "./student.model";
 
 
 const createStudent = async (req: Request, res: Response) => {
@@ -8,14 +9,14 @@ const createStudent = async (req: Request, res: Response) => {
   const { student: studentData } = req.body;
 
   const studentZodParsed =studentValidationSchema.parse(studentData);
-    console.log("yooooo", studentZodParsed)
+    // console.log("yooooo", studentZodParsed)
 
   try {
    
     const result = await StudentServices.createStudentIntoDb(studentZodParsed);
-
+    //  console.log("zzzzzzzzzzzz",result)
     // Send response
-    res.status(201).json({
+    res.status(200).json({
       status: true,
       message: "Created student successfully",
       data: result,
@@ -52,7 +53,7 @@ const getAllStudent = async (req: Request, res: Response) => {
 const findOneStudent = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    const result = await StudentServices.findOneStudent(id);
+    const result = await StudentServices.findOneStudent(id)
 
     res.status(200).json({
       ststus: true,
@@ -67,8 +68,30 @@ const findOneStudent = async (req: Request, res: Response) => {
     });
   }
 };
+
+const deleteOneFromtheDatabase = async (req:Request, res:Response)=>{
+  const id = req.params.id;
+  console.log("controller", id)
+
+  try{
+    const result =await StudentServices.deleteOneFromTheDatabase(id)
+    res.status(200).json({
+      ststus: true,
+      message: "sucessfully deleted a student",
+      body: result,
+    });
+  }
+  catch(err){
+    res.status(400).json({
+      ststus: false,
+      message: "something went wrong",
+      body: err,
+    });
+  }
+}
 export const StudentController = {
   createStudent,
   getAllStudent,
   findOneStudent,
+  deleteOneFromtheDatabase
 };
